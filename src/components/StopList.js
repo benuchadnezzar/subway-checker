@@ -1,20 +1,17 @@
-/*Component that renders an unordered list of subway stops
-pulled from the MTA's API*/
-
 import React from 'react';
 import PropTypes from 'prop-types';
 
 function StopList (props) {
 	return (
-		<ul>
+		<select>
 			{
-				props.stops.map(stop =>
-					<li key={stop.id}>
-						{stop.name}
-					</li>
+				props.stops.map((stop) =>
+					<option key={stop}>
+						{stop}
+					</option>
 				)
 			}
-		</ul>
+		</select>
 	)
 }
 StopList.PropTypes = {

@@ -1,16 +1,15 @@
-// Component that renders an unordered list of subway lines
-// pulled from the MTA's API
-
 import React from 'react';
 import PropTypes from 'prop-types';
 
 function SubList (props) {
+	const subways = ['--', '1', '2', '3', '4', '5', '6', 'S', 'C',
+	'B', 'D', 'N', 'Q', 'R', 'L']
 	return (
 		<select>
 			{
-				props.subways.map(subway =>
-					<option key={subway.id} onClick={() => props.onSubSelect(subway)}>
-						{subway.name}
+				subways.map(sub =>
+					<option key={sub} onClick={() => props.onSubSelect(sub)}>
+						{sub}
 					</option>
 				)
 			}
@@ -18,7 +17,6 @@ function SubList (props) {
 	)
 }
 SubList.PropTypes = {
-	subways: React.PropTypes.array.isRequired,
 	onSubSelect: React.PropTypes.func.isRequired
 };
 

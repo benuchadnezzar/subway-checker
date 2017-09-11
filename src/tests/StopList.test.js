@@ -2,13 +2,18 @@ import React from 'react';
 import {shallow} from 'enzyme';
 import StopList from '../components/StopList';
 
-// Tests that the props passed to StopList render as an unordered list
-it('should render a list of subway stops as an unordered list', () => {
-	const mockStops = [
-		{id: 1, name: 'Mock stop 1'},
-		{id: 2, name: 'Mock stop 2'},
-		{id: 3, name: 'Mock stop 3'},
-	];
-	const wrapper = shallow(<StopList stops={mockStops}/>);
-	expect(wrapper.find('li').length).toEqual(mockStops.length);
+let mockStops, wrapper;
+
+beforeEach(() => {
+	mockStops = [1, 2, 3];
+	wrapper = shallow(<StopList stops={mockStops}/>);
+});
+
+it('should render a list of stops as a dropdown', () => {
+	expect(wrapper.find('option').length).toEqual(mockStops.length);
+});
+
+it('should display the stop name in each `<option>` element', () => {
+	const firstElement = wrapper.find('option').first();
+	expect(firstElement.contains(mockStops[0])).toEqual(true);
 });
