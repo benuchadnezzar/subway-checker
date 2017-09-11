@@ -6,7 +6,7 @@ function StopList (props) {
 		<select>
 			{
 				props.stops.map((stop) =>
-					<option key={stop}>
+					<option key={stop} onClick={() => props.onStopSelect(stop)}>
 						{stop}
 					</option>
 				)
@@ -15,7 +15,8 @@ function StopList (props) {
 	)
 }
 StopList.PropTypes = {
-	stops: React.PropTypes.array.isRequired
+	stops: React.PropTypes.array.isRequired,
+	onStopSelect: React.PropTypes.func.isRequired
 };
 
 export default StopList;

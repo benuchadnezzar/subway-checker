@@ -12,7 +12,7 @@ class SubCheck extends Component {
   	this.state = {
   		selectedSub: '--',
     	selectedStop: null,
-    	stops: [],
+    	stops: ['--'],
   	};
   	this.handleSubSelect.bind(this);
   	this.handleStopSelect.bind(this);
@@ -49,7 +49,7 @@ class SubCheck extends Component {
 		return (
 			<div>
 				<SubList onSubSelect={this.handleSubSelect.bind(this)}/>
-				<StopList stops={this.state.stops}/>
+				<StopList stops={this.state.stops} onStopSelect={this.handleStopSelect.bind(this)}/>
 			</div>
 		);
 	}
