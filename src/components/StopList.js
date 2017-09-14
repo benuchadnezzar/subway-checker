@@ -5,7 +5,7 @@ function StopList (props) {
 	return (
 		<select>
 			{
-				props.stops.map((stop) =>
+				props.stops.map(stop =>
 					<option key={stop} onClick={() => props.onStopSelect(stop)}>
 						{stop}
 					</option>
