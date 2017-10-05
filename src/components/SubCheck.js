@@ -10,7 +10,7 @@ class SubCheck extends Component {
   constructor (props) {
   	super(props);
   	this.state = {
-  		selectedSub: '',
+  		selectedSub: null,
     	selectedStop: null,
     	stops: [],
   	};
