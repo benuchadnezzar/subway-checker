@@ -1,22 +1,21 @@
 const stop = 'Lorimer St';
+const sub = 'L';
 
-function reverseStop (stop) {
+var ReverseStopMock = (function (stopIdN, stopIdS) {
 	var stopData = require('../utils/stops');
 	var invalidEntries = 0;
-	var stopIdN;
-	var stopIdS;
 	function filterByName (item) {
-		if (item.stop_name == stop) {
+		if (item.stop_name == stop && item.stop_id.charAt(0) == sub) {
 			return true;
 		}
 		invalidEntries++;
 		return false;
 	}
 	var stopObjs = stopData.filter(filterByName);
-	for (i = 0; i < stopObjs.length; i++) {
-		if (i.stop_id.charAt(-1) == 'N') {
+	for (var i = 0; i < stopObjs.length; i++) {
+		if (stopObjs[i].stop_id.charAt(stopObjs[i].stop_id.length - 1) == 'N') {
 			stopIdN = stopObjs[i].stop_id;
-		} else if (i.stop_id.charAt(-1) == 'S') {
+		} else if (stopObjs[i].stop_id.charAt(stopObjs[i].stop_id.length - 1) == 'S') {
 			stopIdS = stopObjs[i].stop_id;
 		}
 	}
@@ -24,6 +23,6 @@ function reverseStop (stop) {
 		stopIdN: stopIdN,
 		stopIdS: stopIdS
 	};
-}
+})();
 
 export default ReverseStopMock;

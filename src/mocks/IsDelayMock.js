@@ -37,3 +37,5 @@ function isDelay () {
 		return { isDelay: yesDelay };
 	}
 }
+
+export default isDelay;

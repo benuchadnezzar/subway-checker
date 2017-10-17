@@ -27,31 +27,35 @@ function getFeedData (sub) {
 				feedId = 31;
 				break;
 	}
-	axios.get('http://datamine.mta.info/mta_esi.php?key=5db5e052519d17320f490738f2afe0d5&feed_id=' + feedId)
-		.then(function innerFunc (body) {
-			var feedData = body.data;
-			var feed = GtfsRealtimeBindings.FeedMessage.decode(feedData);
-			return { feed: feed };
-		});
+	var requestSettings = {
+	  method: 'GET',
+	  url: 'http://datamine.mta.info/mta_esi.php?key=YOUR_KEY_HERE&feed_id=2',
+	  encoding: null
+	};
+	request()
+	request(requestSettings, function (error, response, body) {
+	  if (!error && response.statusCode == 200) {
+		  var feed = GtfsRealtimeBindings.FeedMessage.decode(body);
+		  return { feed: feed };
+		}
+	});
 }
 
-function reverseStop (stop) {
+var reverseStop = (function (stopIdN, stopIdS) {
 	var stopData = require('./stops');
 	var invalidEntries = 0;
-	var stopIdN;
-	var stopIdS;
 	function filterByName (item) {
-		if (item.stop_name == stop) {
+		if (item.stop_name == stop && item.stop_id.charAt(0) == sub) {
 			return true;
 		}
 		invalidEntries++;
 		return false;
 	}
 	var stopObjs = stopData.filter(filterByName);
-	for (i = 0; i < stopObjs.length; i++) {
-		if (i.stop_id.charAt(-1) == 'N') {
+	for (var i = 0; i < stopObjs.length; i++) {
+		if (stopObjs[i].stop_id.charAt(stopObjs[i].stop_id.length - 1) == 'N') {
 			stopIdN = stopObjs[i].stop_id;
-		} else if (i.stop_id.charAt(-1) == 'S') {
+		} else if (stopObjs[i].stop_id.charAt(stopObjs[i].stop_id.length - 1) == 'S') {
 			stopIdS = stopObjs[i].stop_id;
 		}
 	}
@@ -59,7 +63,7 @@ function reverseStop (stop) {
 		stopIdN: stopIdN,
 		stopIdS: stopIdS
 	};
-}
+})();
 
 function isDelayN (sub, stop) {
 	var arrivals = [];
