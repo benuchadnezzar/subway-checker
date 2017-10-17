@@ -1,7 +1,3 @@
-// Notes to myself: 1) Do I need another return in getFeedData?
-// 2) If all unit tests work individually, integration test will
-// be if whole file works together.
-
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import axios from 'axios';
 
@@ -29,7 +25,7 @@ function getFeedData (sub) {
 	}
 	var requestSettings = {
 	  method: 'GET',
-	  url: 'http://datamine.mta.info/mta_esi.php?key=YOUR_KEY_HERE&feed_id=2',
+	  uri: 'http://datamine.mta.info/mta_esi.php?key=YOUR_KEY_HERE&feed_id=2',
 	  encoding: null
 	};
 	request()
@@ -65,7 +61,7 @@ var reverseStop = (function (stopIdN, stopIdS) {
 	};
 })();
 
-function isDelayN (sub, stop) {
+var isDelayN = (function (sub, stop) {
 	var arrivals = [];
 	var delays = [];
 	reverseStop(stop);
@@ -92,9 +88,9 @@ function isDelayN (sub, stop) {
 		yesDelay = Math.ceil(delay / 60);
 		return { isDelay: yesDelay };
 	}
-}
+})();
 
-function isDelayS (sub, stop) {
+var isDelayS = (function (sub, stop) {
 	var arrivals = [];
 	var delays = [];
 	reverseStop(stop);
@@ -121,7 +117,7 @@ function isDelayS (sub, stop) {
 		yesDelay = Math.ceil(delay / 60);
 		return { isDelay: yesDelay };
 	}
-}
+})();
 
 module.exports = {
 	subOnTime: function (sub, stop) {

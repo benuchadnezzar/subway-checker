@@ -1,23 +1,14 @@
 var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
-var request = require('request');
+var fs = require('fs');
 
-var requestSettings = {
-  method: 'GET',
-  url: './MockPBufData',
-  encoding: null
-};
-
-function RequestMock () {
-	request(requestSettings, function (error, response, body) {
-	  if (!error) {
-	  var feed = GtfsRealtimeBindings.FeedMessage.decode(body);
-	  feed.entity.forEach(function(entity) {
-	  	if (entity.trip_update) {
-	  		console.log(entity.trip_update);
-	    }
-	   });
-	  }
+var RequestMock = new Promise(function (resolve, reject) {
+	fs.readFile('./MockPBufData.txt', function (err, data) {
+		if (err) {
+			reject(err);
+		}
+		var feed = GtfsRealtimeBindings.FeedMessage.decode(data);
+		resolve({ feed: feed });
 	});
-}
+});
 
-RequestMock();
+export default RequestMock;
