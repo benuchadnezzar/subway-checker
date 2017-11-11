@@ -8,7 +8,7 @@ var RequestMock = new Promise(function (resolve, reject) {
 		}
 		var feed = GtfsRealtimeBindings.FeedMessage.decode(data);
 		resolve({ feed: feed });
-	});
-});
+	})
+})
 
 export default RequestMock;
