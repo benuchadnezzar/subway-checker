@@ -25,7 +25,7 @@ function getFeedData (sub) {
 	}
 	var requestSettings = {
 	  method: 'GET',
-	  uri: 'http://datamine.mta.info/mta_esi.php?key=YOUR_KEY_HERE&feed_id=2',
+	  uri: 'http://datamine.mta.info/mta_esi.php?key=5db5e052519d17320f490738f2afe0d5&feed_id=2',
 	  encoding: null
 	};
 	request(requestSettings, function (error, response, body) {
