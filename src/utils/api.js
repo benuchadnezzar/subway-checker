@@ -1,19 +1,19 @@
-import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
-import request from 'request';
+import GtfsRealtimeBindings from 'mta-gtfs-realtime-bindings';
+import rp from 'request-promise';
 
 function getFeedData (sub) {
 	var feedId;
 	switch (sub) {
-		case '1' || '2' || '3' || '4' || '5' || '6' || 'S':
+		case '1': case '2': case '3': case '4': case '5': case '6': case 'S':
 				feedId = 1;
 				break;
-			case 'A' || 'C' || 'E':
+			case 'A': case 'C': case 'E':
 				feedId = 26;
 				break;
-			case 'N' || 'Q' || 'R' || 'W':
+			case 'N': case 'Q': case 'R': case 'W':
 				feedId = 16;
 				break;
-			case 'B' || 'D' || 'F' || 'M':
+			case 'B': case 'D': case 'F': case 'M':
 				feedId = 21;
 				break;
 			case 'L':
@@ -23,18 +23,14 @@ function getFeedData (sub) {
 				feedId = 31;
 				break;
 	}
-	var requestSettings = {
-	  method: 'GET',
-	  uri: 'http://datamine.mta.info/mta_esi.php?key=5db5e052519d17320f490738f2afe0d5&feed_id=2',
-	  encoding: null
-	};
-	request(requestSettings, function (error, response, body) {
-	  if (!error && response.statusCode == 200) {
-		  var feed = GtfsRealtimeBindings.FeedMessage.decode(body);
-		  return { feed: feed };
-		}
+	rp({
+		method: 'GET',
+		url: 'http://datamine.mta.info/mta_esi.php?key=5db5e052519d17320f490738f2afe0d5&feed_id=' + feedId,
+		encoding: null
+	}).then((buf) => {
+		const feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buf);
+		return { feed: feed };
 	});
-}
 
 function reverseStop (sub, stop) {
 	var stopIdN
@@ -62,62 +58,61 @@ function reverseStop (sub, stop) {
 	};
 }
 
-var isDelayN = (function (sub, stop) {
-	var arrivals = [];
-	var delays = [];
-	reverseStop(sub, stop);
-	getFeedData(sub);
-	(function () {
-			var invalidEntries = 0;
-			var feedObjs = getFeedData.feed.filter(function (feedObj) {
-				if (feedObj.entity.trip_update.stop_time_update.stop_id == reverseStop.stopIdN) {
-					return feedObj.entity.trip_update.stop_time_update;
+module.exports = {
+	isDelayN: function (sub, stop) {
+		var arrivals = [];
+		var delays = [];
+		reverseStop(sub, stop);
+		getFeedData(sub);
+		(function () {
+				var invalidEntries = 0;
+				var feedObjs = getFeedData.feed.filter(function (feedObj) {
+					if (feedObj.entity.trip_update.stop_time_update.stop_id == reverseStop.stopIdN) {
+						return feedObj.entity.trip_update.stop_time_update;
+					}
+				});
+				for (var i = 0; i < feedObjs.length; i++) {
+					arrivals.push(feedObjs.arrival.time.low);
+					delays.push(feedObjs.arrival.delay);
+				}
+			})();
+		var nextArrival = Math.min(...arrivals);
+		var delayIndex = arrivals.findIndexOf(nextArrival);
+		var delay = delays.delayIndex;
+		if (delay === null || Math.ceil(delay / 60) <= 5) {
+			var noDelay = Math.ceil((nextArrival - getFeedData.feed.header.timestamp.low) / 60);
+			// return { noDelay: noDelay };
+		} else {
+			var yesDelay = Math.ceil(delay / 60);
+			// return { yesDelay: yesDelay };
+		}
+	},
+	isDelayS: function (sub, stop) {
+		var arrivals = [];
+		var delays = [];
+		reverseStop(stop);
+		getFeedData(sub)
+			.then(function (feed) {
+				var invalidEntries = 0;
+				var feedObjs = feed.filter(function (feedObj) {
+					if (feedObj.entity.trip_update.stop_time_update.stop_id == reverseStop.stopIdS) {
+						return feedObj.entity.trip_update.stop_time_update;
+					}
+				});
+				for (var i = 0; i < feedObjs; i++) {
+					arrivals.push(feedObjs.arrival.time.low);
+					delays.push(feedObjs.arrival.delay);
 				}
 			});
-			for (var i = 0; i < feedObjs.length; i++) {
-				arrivals.push(feedObjs.arrival.time.low);
-				delays.push(feedObjs.arrival.delay);
-			}
-		})();
-	var nextArrival = Math.min(...arrivals);
-	var delayIndex = arrivals.findIndexOf(nextArrival);
-	var delay = delays.delayIndex;
-	if (delay === null || Math.ceil(delay / 60) <= 5) {
-		var noDelay = Math.ceil((nextArrival - getFeedData.feed.header.timestamp.low) / 60);
-		return { noDelay: noDelay };
-	} else {
-		var yesDelay = Math.ceil(delay / 60);
-		return { yesDelay: yesDelay };
+		var nextArrival = Math.min(...arrivals);
+		var delayInex = arrivals.findIndexOf(nextArrival);
+		var delay = delays.delayIndex;
+		if (delay === null || Math.ceil(delay / 60) <= 5) {
+			var noDelay = Math.ceil((nextArrival - getFeedData.feed.header.timestamp.low) / 60);
+			// return { noDelay: noDelay };
+		} else {
+			var yesDelay = Math.ceil(delay / 60);
+			// return { yesDelay: yesDelay };
+		}
 	}
-})();
-
-var isDelayS = (function (sub, stop) {
-	var arrivals = [];
-	var delays = [];
-	reverseStop(stop);
-	getFeedData(sub)
-		.then(function (feed) {
-			var invalidEntries = 0;
-			var feedObjs = feed.filter(function (feedObj) {
-				if (feedObj.entity.trip_update.stop_time_update.stop_id == reverseStop.stopIdS) {
-					return feedObj.entity.trip_update.stop_time_update;
-				}
-			});
-			for (var i = 0; i < feedObjs; i++) {
-				arrivals.push(feedObjs.arrival.time.low);
-				delays.push(feedObjs.arrival.delay);
-			}
-		});
-	var nextArrival = Math.min(...arrivals);
-	var delayInex = arrivals.findIndexOf(nextArrival);
-	var delay = delays.delayIndex;
-	if (delay === null || Math.ceil(delay / 60) <= 5) {
-		var noDelay = Math.ceil((nextArrival - getFeedData.feed.header.timestamp.low) / 60);
-		return { noDelay: noDelay };
-	} else {
-		var yesDelay = Math.ceil(delay / 60);
-		return { yesDelay: yesDelay };
-	}
-})();
-
-export { isDelayN, isDelayS };
+}
