@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isDelayN, isDelayS } from '../utils/api.js';
+import { isDelayN, isDelayS } from '../utils/api';
 
 function IsDelayN (props) {
 	isDelayN(props.sub, props.stop);
-	if (isDelayN.noDelay) {
+	if (props.stop === null) {
+		return (null);
+	} else if (isDelayN.noDelay) {
 		return (<p>The next train will arrive in {isDelayN.noDelay} minutes.</p>);
 	} else if (isDelayN.yesDelay <= 10) {
 		return (<p>A {isDelayN.yesDelay} delay isn't that big a deal, right?</p>);
@@ -17,7 +19,9 @@ function IsDelayN (props) {
 
 function IsDelayS (props) {
 	isDelayS(props.sub, props.stop);
-	if (isDelayS.noDelay) {
+	if (props.stop === null) {
+		return (null);
+	} else if (isDelayS.noDelay) {
 		return (<p>The next train will arrive in {isDelayS.noDelay} minutes.</p>);
 	} else if (isDelayS.yesDelay <= 10) {
 		return (<p>A {isDelayS.yesDelay} delay isn't that big a deal, right?</p>);

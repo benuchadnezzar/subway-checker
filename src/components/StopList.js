@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 
 function StopList (props) {
 	return (
-		<select>
+		<select onChange={props.onStopSelect}>
 			{
 				props.stops.map(stop =>
-					<option key={stop} onClick={() => props.onStopSelect(stop)}>
+					<option key={stop}>
 						{stop}
 					</option>
 				)

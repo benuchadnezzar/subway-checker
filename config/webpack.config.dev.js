@@ -92,6 +92,11 @@ module.exports = {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
+      // Fixes camel case issues in protobufjs
+      //Long: __dirname + "/node_modules/protobufjs/node_modules/bytebuffer/node_modules/long/dist/Long.js",
+      //long: __dirname + "/node_modules/protobufjs/node_modules/bytebuffer/node_modules/long/dist/Long.js",
+      //ByteBuffer: __dirname + "/node_modules/protobufjs/node_modules/bytebuffer/dist/ByteBufferAB.js",
+      //bytebuffer: __dirname + "/node_modules/protobufjs/node_modules/bytebuffer/dist/ByteBufferAB.js",
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -148,7 +153,6 @@ module.exports = {
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
               // directory for faster rebuilds.

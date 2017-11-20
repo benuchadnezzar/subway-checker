@@ -34,7 +34,6 @@ class SubCheck extends Component {
 			}
 		}
 		this.setState(() => {
-			console.log('setting state');
 			return {
 				selectedSub: sub,
 				stops: stopsArray
