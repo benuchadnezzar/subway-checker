@@ -25,17 +25,15 @@ it('should display the stop name in each `<option>` element', () => {
 
 it('should call `props.onStopSelect` when an `option` is clicked', 
 () => {
-	const firstElement = wrapper.find('option').first();
-	
 	// Expect that no calls have been made yet
 	expect(stopSelectFn.mock.calls.length).toEqual(0);
 
 	// Click the <option>
-	firstElement.simulate('click');
+	wrapper.find('select').simulate('change', 2);
 
 	// Check that the function has been called
 	expect(stopSelectFn.mock.calls.length).toEqual(1);
 
 	// Check that the function was called with the right arguments
-	expect(stopSelectFn.mock.calls[0][0]).toEqual(mockStops[0]);
+	expect(stopSelectFn.mock.calls[0][0]).toEqual(mockStops[1]);
 });

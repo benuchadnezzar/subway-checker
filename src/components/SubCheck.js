@@ -4,7 +4,7 @@
 import React, { Component } from 'react';
 import SubList from './SubList';
 import StopList from './StopList';
-import { IsDelayN, IsDelayS } from './IsDelay';
+import { DelayN, DelayS } from './IsDelay';
 
 class SubCheck extends Component {
 
@@ -50,8 +50,8 @@ class SubCheck extends Component {
 			<div>
 				<SubList onSubSelect={this.handleSubSelect}/>
 				<StopList stops={this.state.stops} onStopSelect={this.handleStopSelect}/>
-				<IsDelayN sub={this.state.selectedSub} stop={this.state.selectedStop}/>
-				<IsDelayS sub={this.state.selectedSub} stop={this.state.selectedStop}/>
+				<DelayN sub={this.state.selectedSub} stop={this.state.selectedStop}/>
+				<DelayS sub={this.state.selectedSub} stop={this.state.selectedStop}/>
 			</div>
 		);
 	}

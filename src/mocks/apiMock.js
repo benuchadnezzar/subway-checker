@@ -1,6 +1,3 @@
-import GtfsRealtimeBindings from 'mta-gtfs-realtime-bindings';
-import rp from 'request-promise';
-
 const GetFeedData = (function () {
 	let feed, feedId;
 	return {
@@ -27,13 +24,9 @@ const GetFeedData = (function () {
 			}
 		},
 		getFeedData: function () {
-			rp({
-				method: 'GET',
-				url: 'https://cors-anywhere.herokuapp.com/http://datamine.mta.info/mta_esi.php?key=5db5e052519d17320f490738f2afe0d5&feed_id=' + feedId,
-				encoding: null
-			}).then((buf) => {
-				feed = GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(buf);
-			});
+			if (feedId === 2) {
+				feed = require('./MockData');
+			}
 		},
 		feed: feed
 	};
@@ -41,7 +34,7 @@ const GetFeedData = (function () {
 
 const ReverseStop = (function () {
 	let stopIdN, stopIdS;
-	const stopData = require('./stops');
+	const stopData = require('../utils/stops');
 	return {
 		reverseStop: function (sub, stop) {
 			var invalidEntries = 0;
@@ -67,7 +60,7 @@ const ReverseStop = (function () {
 })();
 
 export const IsDelayN = (function () {
-	let noDelay, yesDelay;
+	let noDelay, yesDelay, nextArrival, delay;
 	return {
 		isDelay: function (sub, stop) {
 			GetFeedData.getFeedId(sub);
@@ -87,9 +80,9 @@ export const IsDelayN = (function () {
 					delays.push(feedObjs.arrival.delay);
 				}
 			}
-			var nextArrival = Math.min(...arrivals);
+			nextArrival = Math.min(...arrivals);
 			var delayIndex = arrivals.indexOf(nextArrival);
-			var delay = delays.delayIndex;
+			delay = delays.delayIndex;
 			if (delay === null || Math.ceil(delay / 60) <= 5) {
 				noDelay = Math.ceil((nextArrival - GetFeedData.feed.header.timestamp.low) / 60);
 			} else {
@@ -98,11 +91,12 @@ export const IsDelayN = (function () {
 		},
 		noDelay: noDelay,
 		yesDelay: yesDelay,
+		nextArrival: nextArrival 
 	};
 })();
 
 export const IsDelayS = (function () {
-	let noDelay, yesDelay;
+	let noDelay, yesDelay, nextArrival, delay;
 	return {
 		isDelay: function (sub, stop) {
 			GetFeedData.getFeedId(sub);
@@ -122,9 +116,9 @@ export const IsDelayS = (function () {
 					delays.push(feedObjs.arrival.delay);
 				}
 			}
-			var nextArrival = Math.min(...arrivals);
+			nextArrival = Math.min(...arrivals);
 			var delayIndex = arrivals.indexOf(nextArrival);
-			var delay = delays.delayIndex;
+			delay = delays.delayIndex;
 			if (delay === null || Math.ceil(delay / 60) <= 5) {
 				noDelay = Math.ceil((nextArrival - GetFeedData.feed.header.timestamp.low) / 60);
 			} else {
@@ -133,5 +127,6 @@ export const IsDelayS = (function () {
 		},
 		noDelay: noDelay,
 		yesDelay: yesDelay,
+		nextArrival: nextArrival
 	};
 })();
