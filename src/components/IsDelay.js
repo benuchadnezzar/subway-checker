@@ -1,36 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { IsDelayN, IsDelayS } from '../utils/api';
+import { isDelayN, isDelayS } from '../utils/api';
 
 function DelayN (props) {
 	if (props.stop === null) {
 		return (null);
-	}
-	IsDelayN.isDelay(props.sub, props.stop);
-	if (IsDelayN.noDelay) {
-		return (<p>The next train will arrive in {IsDelayN.noDelay} minutes.</p>);
-	} else if (IsDelayN.yesDelay <= 10) {
-		return (<p>A {IsDelayN.yesDelay} delay isn't that big a deal, right?</p>);
-	} else if (IsDelayN.yesDelay > 10 && IsDelayN.yesDelay <= 15) {
-		return (<p>Oof, you've got a {IsDelayN.yesDelay} minute delay. You should let your boss/friends/Tinder date know you're going to be late.</p>);
+	} else if (typeof isDelayN(props.sub, props.stop).then === 'function') {
+		return isDelayN(props.sub, props.stop).then((data) => {
+			return (<p>The next northbound train is coming in {data} minutes</p>);
+		});
+	} else if (isDelayN(props.sub, props.stop) <= 10) {
+		return (<p>Ok, a {isDelayN(props.stop, props.sub)} minute delay on the northbound train isn't so bad, right?</p>)
+	} else if (isDelayN(props.sub, props.stop) > 10 && isDelayN(props.sub, props.stop) <= 15) {
+		return (<p>Oof, you've got a {isDelayN(props.sub, props.stop)} minute delay. You should let your boss/friends/Tinder date know you're going to be late.</p>);
 	} else {
-		return (<p>So... The MTA's reporting a {IsDelayN.yesDelay} minute delay for you right now. Tbh, wherever you're headed, you might as well call out sick.</p>);
+		return (<p>So... The MTA's reporting a {isDelayN(props.sub, props.stop)} minute delay for you right now. Tbh, wherever you're headed, you might as well call out sick.</p>);
 	}
 }
 
-function DelayS (props) {
+function DelayS(props) {
 	if (props.stop === null) {
 		return (null);
-	}
-	IsDelayS.isDelay(props.sub, props.stop);
-	if (IsDelayS.noDelay) {
-		return (<p>The next train will arrive in {IsDelayS.noDelay} minutes.</p>);
-	} else if (IsDelayS.yesDelay <= 10) {
-		return (<p>A {IsDelayS.yesDelay} delay isn't that big a deal, right?</p>);
-	} else if (IsDelayS.yesDelay > 10 && IsDelayS.yesDelay <= 15) {
-		return (<p>Oof, you've got a {IsDelayS.yesDelay} minute delay. You should let your boss/friends/Tinder date know you're going to be late.</p>);
+	} else if (typeof isDelayS(props.sub, props.stop).then === 'function') {
+		return isDelayS(props.sub, props.stop).then((data) => {
+			return (<p>The next northbound train is coming in {data} minutes</p>);
+		});
+	} else if (isDelayS(props.sub, props.stop) <= 10) {
+		return (<p>Ok, a {isDelayS(props.stop, props.sub)} minute delay on the northbound train isn't so bad, right?</p>)
+	} else if (isDelayS(props.sub, props.stop) > 10 && isDelayS(props.sub, props.stop) <= 15) {
+		return (<p>Oof, you've got a {isDelayS(props.sub, props.stop)} minute delay. You should let your boss/friends/Tinder date know you're going to be late.</p>);
 	} else {
-		return (<p>So... The MTA's reporting a {IsDelayS.yesDelay} minute delay for you right now. Tbh, wherever you're headed, you might as well call out sick.</p>);
+		return (<p>So... The MTA's reporting a {isDelayS(props.sub, props.stop)} minute delay for you right now. Tbh, wherever you're headed, you might as well call out sick.</p>);
 	}
 }
 

@@ -1,132 +1,79 @@
-const GetFeedData = (function () {
-	let feed, feedId;
-	return {
-		getFeedId: function (sub) {
-			switch (sub) {
-				case '1': case '2': case '3': case '4': case '5': case '6': case 'S':
-					feedId = 1;
-					break;
-				case 'A': case 'C': case 'E':
-					feedId = 26;
-					break;
-				case 'N': case 'Q': case 'R': case 'W':
-					feedId = 16;
-					break;
-				case 'B': case 'D': case 'F': case 'M':
-					feedId = 21;
-					break;
-				case 'L':
-					feedId = 2;
-					break;
-				case 'G':
-					feedId = 31;
-					break;
-			}
-		},
-		getFeedData: function () {
-			if (feedId === 2) {
-				feed = require('./MockData');
-			}
-		},
-		feed: feed
-	};
-})();
+const axios = require('axios');
 
-const ReverseStop = (function () {
-	let stopIdN, stopIdS;
-	const stopData = require('../utils/stops');
-	return {
-		reverseStop: function (sub, stop) {
-			var invalidEntries = 0;
-			function filterByName (item) {
-				if (item.stop_name == stop && typeof item.stop_id === 'string' && item.stop_id.charAt(0) == sub) {
-					return true;
-				}
-				invalidEntries ++;
-				return false;
-			}
-			var stopObjs = stopData.filter(filterByName);
-			for (var i = 0; i < stopObjs.length; i++) {
-				if (stopObjs[i].stop_id.charAt(stopObjs[i].stop_id.length - 1) == 'N') {
-					stopIdN = stopObjs[i].stop_id;
-				} else if (stopObjs[i].stop_id.charAt(stopObjs[i].stop_id.length - 1) == 'S') {
-					stopIdS = stopObjs[i].stop_id;
-				}
-			}
-		},
-		stopIdN: stopIdN,
-		stopIdS: stopIdS
-	};
-})();
+export function getFeedId (sub) {
+	switch (sub) {
+		case '1': case '2': case '3': case '4': case '5': case '6': case 'S':
+			return 1;
+		case 'A': case 'C': case 'E':
+			return 26;
+		case 'N': case 'Q': case 'R': case 'W':
+			return 16;
+		case 'B': case 'D': case 'F': case 'M':
+			return 21;
+		case 'L':
+			return 2;
+		case 'G':
+			return 31;
+	}
+}
 
-export const IsDelayN = (function () {
-	let noDelay, yesDelay, nextArrival, delay;
-	return {
-		isDelay: function (sub, stop) {
-			GetFeedData.getFeedId(sub);
-			GetFeedData.getFeedData();
-			ReverseStop.reverseStop(sub, stop);
-			var arrivals = [];
-			var delays = [];
-			function dataFilter () {
-				var invalidEntries = 0;
-				var feedObjs = GetFeedData.feed.filter(function (feedObj) {
-					if (feedObj.entity.trip_update.stop_time_update.stop_id == ReverseStop.stopIdN) {
-						return feedObj.entity.trip_update.stop_time_update;
-					}
-				});
-				for (var i = 0; i < feedObjs.length; i++) {
-					arrivals.push(feedObjs.arrival.time.low);
-					delays.push(feedObjs.arrival.delay);
-				}
-			}
-			nextArrival = Math.min(...arrivals);
-			var delayIndex = arrivals.indexOf(nextArrival);
-			delay = delays.delayIndex;
-			if (delay === null || Math.ceil(delay / 60) <= 5) {
-				noDelay = Math.ceil((nextArrival - GetFeedData.feed.header.timestamp.low) / 60);
-			} else {
-				yesDelay = Math.ceil(delay / 60);
-			}
-		},
-		noDelay: noDelay,
-		yesDelay: yesDelay,
-		nextArrival: nextArrival 
-	};
-})();
+export function getFeedData (sub) {
+	if (getFeedId(sub) === 2) {
+		return axios.get('http://localhost:4000').then((data) => JSON.parse(data));
+	}
+}
 
-export const IsDelayS = (function () {
-	let noDelay, yesDelay, nextArrival, delay;
-	return {
-		isDelay: function (sub, stop) {
-			GetFeedData.getFeedId(sub);
-			GetFeedData.getFeedData();
-			ReverseStop.reverseStop(sub, stop);
-			var arrivals = [];
-			var delays = [];
-			function dataFilter () {
-				var invalidEntries = 0;
-				var feedObjs = GetFeedData.feed.filter(function (feedObj) {
-					if (feedObj.entity.trip_update.stop_time_update.stop_id == ReverseStop.stopIdS) {
-						return feedObj.entity.trip_update.stop_time_update;
-					}
-				});
-				for (var i = 0; i < feedObjs; i++) {
-					arrivals.push(feedObjs.arrival.time.low);
-					delays.push(feedObjs.arrival.delay);
-				}
-			}
-			nextArrival = Math.min(...arrivals);
-			var delayIndex = arrivals.indexOf(nextArrival);
-			delay = delays.delayIndex;
-			if (delay === null || Math.ceil(delay / 60) <= 5) {
-				noDelay = Math.ceil((nextArrival - GetFeedData.feed.header.timestamp.low) / 60);
-			} else {
-				yesDelay = Math.ceil(delay / 60);
-			}
-		},
-		noDelay: noDelay,
-		yesDelay: yesDelay,
-		nextArrival: nextArrival
-	};
-})();
+export function reverseStop (sub, stop) {
+	const stops = require('../utils/stops');
+	const stopN = stops.filter((subStop) => {
+		return subStop.stop_name === stop && subStop.stop_id.charAt(0) === sub;
+	}).find((subStop) => {
+		return subStop.stop_id.charAt(subStop.stop_id.length - 1) === 'N';
+	});
+	return stopN.stop_id;
+}
+
+export function isDelay (sub, stop) {
+	return getFeedData(sub).then((data) => {
+		return data.entity.filter((entityObj) => {
+			return entityObj.stop_time_update !== undefined;
+		});
+	}).then((newData) =>  {
+		console.log(newData);
+	}).catch((err) => {
+		console.log(err);
+	});
+}
+
+
+
+
+
+// export function isDelay (sub, stop) {
+// 	let arrivals, delays = [];
+// 	const feedObjs = getFeedData(sub).then((data) => {
+// 		data.entity.filter((entityObj) => {
+// 			return entityObj.trip_update.stop_time_update.stop_id === reverseStop(sub, stop)
+
+// 			if (entityObj.trip_update !== null && entityObj.trip_update.stop_time_update.stop_id == reverseStopN(sub, stop)) {
+// 				return entityObj.trip_update.stop_time_update;
+// 			}
+// 		});
+// 	});
+// 	for (var i = 0; i < feedObjs.length; i++) {
+// 		if (feedObjs.arrival !== undefined) {
+// 			arrivals.push(feedObjs.arrival.time.low);
+// 			delays.push(feedObjs.arrival.delay);
+// 		}
+// 	}
+// 	const nextArrival = Math.min(...arrivals);
+// 	const delayIndex = arrivals.indexOf(nextArrival);
+// 	const delay = delays.delayIndex;
+// 	if (delay === null) {
+// 		return getFeedData(sub).then((data) => {
+// 			return (nextArrival - data.header.timestamp.low) / 60;
+// 		});
+// 	} else {
+// 		return Math.ceil(delay / 60);
+// 	}
+// }
